@@ -1,0 +1,30 @@
+@page "/HealthCard"
+
+<PageTitle>Health Card</PageTitle>
+
+<div class="phone">
+    <header class="topbar">
+        <button class="icon-button" onclick="history.back()">←</button>
+        <h2>HEALTH CARD</h2>
+        <span></span>
+    </header>
+
+    <main class="screen-content">
+        <article class="health-card">
+            <div class="avatar">👤</div>
+
+            <div class="card-information">
+                <strong>VIVEK MISRA</strong>
+                <span>Example Street 12</span>
+                <span>example@email.com</span>
+                <span>+45 12 34 56 78</span>
+            </div>
+
+            <button class="delete-button" aria-label="Delete card">×</button>
+        </article>
+
+        <button class="add-button" aria-label="Add health card">+</button>
+    </main>
+
+    <BottomNavigation />
+</div>

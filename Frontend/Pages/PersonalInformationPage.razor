@@ -1,0 +1,43 @@
+@page "/PersonalInformation"
+
+<PageTitle>Personal Information</PageTitle>
+
+<div class="phone">
+    <header class="topbar">
+        <button class="icon-button" onclick="history.back()">←</button>
+        <h2>PERSONAL INFO</h2>
+        <span></span>
+    </header>
+
+    <main class="screen-content">
+        <div class="profile-layout">
+            <form class="profile-form">
+                <label>
+                    First name
+                    <input type="text" value="Vivek" />
+                </label>
+
+                <label>
+                    Last name
+                    <input type="text" value="Misra" />
+                </label>
+
+                <label>
+                    Email
+                    <input type="email" value="example@email.com" />
+                </label>
+
+                <label>
+                    Telephone
+                    <input type="tel" value="+45 12 34 56 78" />
+                </label>
+            </form>
+
+            <div class="large-avatar">👤</div>
+        </div>
+
+        <button class="primary-button">Save</button>
+    </main>
+
+    <BottomNavigation />
+</div>

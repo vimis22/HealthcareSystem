@@ -9,4 +9,6 @@ public class User
     public string Streetname { get; set; }
     public string CityId { get; set; }
     public string Password { get; set; }
+    public List<Telephone> Telephones { get; set; } = new();
+    public List<Email> Emails { get; set; } = new();
 }

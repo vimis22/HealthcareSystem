@@ -9,7 +9,6 @@
 
     <ItemGroup>
         <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.4" />
-        <ProjectReference Include="..\DataManager\DataManager.csproj" />
     </ItemGroup>
 
 </Project>

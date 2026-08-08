@@ -1,4 +1,6 @@
 @page "/"
+@inject HttpClient Http
+@using Frontend.Models
 
 <PageTitle>Home</PageTitle>
 
@@ -10,20 +12,65 @@
     </header>
 
     <main class="screen-content">
-        <h3>INTRODUCTION</h3>
+        <h3>VELKOMMEN</h3>
 
-        <div class="image-placeholder">
-            <span>Healthcare illustration</span>
-        </div>
+        @if (user != null)
+        {
+            <p>Hej, @user.Firstname @user.Lastname</p>
+        }
 
-        <div class="text-placeholder">
-            <span></span>
-            <span></span>
-            <span></span>
-            <span></span>
-            <span class="short-line"></span>
-        </div>
+        <h3>NOTIFIKATIONER</h3>
+
+        @if (notifications == null)
+        {
+            <p>Henter notifikationer...</p>
+        }
+        else if (notifications.Count == 0)
+        {
+            <p>Ingen notifikationer.</p>
+        }
+        else
+        {
+            @foreach (var notification in notifications)
+            {
+                <article class="notification-card @(notification.IsRead ? "" : "unread")">
+                    <div>
+                        <strong>@notification.Title</strong>
+                        <p>@notification.Message</p>
+                        <small>@notification.CreatedAt.ToShortDateString()</small>
+                    </div>
+                    @if (!notification.IsRead)
+                    {
+                        <button class="icon-button" @onclick="() => MarkAsRead(notification.Id)">✓</button>
+                    }
+                </article>
+            }
+        }
     </main>
 
     <BottomNavigation />
 </div>
+
+@code {
+    private UserDto? user;
+    private List<NotificationDto>? notifications;
+
+    // Midlertidigt hardcodet ID — erstattes med login senere
+    private string userId = "b34b6f5e-c9f6-43d7-bebe-5920f879f207";
+
+    protected override async Task OnInitializedAsync()
+    {
+        user = await Http.GetFromJsonAsync<UserDto>($"api/user/{userId}");
+        notifications = await Http.GetFromJsonAsync<List<NotificationDto>>($"api/notification/user/{userId}");
+    }
+
+    private async Task MarkAsRead(string notificationId)
+    {
+        var response = await Http.PatchAsync($"api/notification/{notificationId}/read", null);
+        if (response.IsSuccessStatusCode && notifications != null)
+        {
+            var notification = notifications.FirstOrDefault(n => n.Id == notificationId);
+            if (notification != null) notification.IsRead = true;
+        }
+    }
+}

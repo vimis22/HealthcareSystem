@@ -1,4 +1,6 @@
 @page "/HealthCard"
+@inject HttpClient Http
+@using Frontend.Models
 
 <PageTitle>Health Card</PageTitle>
 
@@ -10,21 +12,63 @@
     </header>
 
     <main class="screen-content">
-        <article class="health-card">
-            <div class="avatar">👤</div>
+        @if (loading)
+        {
+            <p>Henter data...</p>
+        }
+        else if (healthCard == null || client == null)
+        {
+            <p>Intet sundhedskort fundet.</p>
+        }
+        else
+        {
+            <article class="health-card">
+                <div class="avatar">👤</div>
 
-            <div class="card-information">
-                <strong>VIVEK MISRA</strong>
-                <span>Example Street 12</span>
-                <span>example@email.com</span>
-                <span>+45 12 34 56 78</span>
-            </div>
+                <div class="card-information">
+                    <strong>@client.Firstname @client.Lastname</strong>
+                    <span>@client.Streetname</span>
+                    <span>CPR: @healthCard.Cpr</span>
+                    <span>Sikringsgruppe: @healthCard.Sikringsgruppe</span>
+                    <span>Gyldig fra: @healthCard.ValidFrom.ToShortDateString()</span>
+                </div>
 
-            <button class="delete-button" aria-label="Delete card">×</button>
-        </article>
+                <button class="delete-button" aria-label="Delete card">×</button>
+            </article>
+        }
 
         <button class="add-button" aria-label="Add health card">+</button>
     </main>
 
     <BottomNavigation />
 </div>
+
+@code {
+    private HealthCardDto? healthCard;
+    private ClientDto? client;
+    private bool loading = true;
+
+    private string clientId = "ab8e8c4a-43d1-4c17-88cc-697000b8b819";
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            var response = await Http.GetAsync($"api/healthcard/client/{clientId}");
+            if (response.IsSuccessStatusCode)
+            {
+                healthCard = await response.Content.ReadFromJsonAsync<HealthCardDto>();
+            }
+
+            if (healthCard != null)
+            {
+                client = await Http.GetFromJsonAsync<ClientDto>($"api/client/{healthCard.ClientId}");
+            }
+        }
+        catch { }
+        finally
+        {
+            loading = false;
+        }
+    }
+}

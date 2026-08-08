@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(powershell -Command \"Get-ChildItem -Path ''C:\\\\Projects\\\\Private_Projects\\\\HealthcareSystem'' -Recurse -Include ''*.dll'' | Unblock-File; Get-ChildItem -Path ''C:\\\\Projects\\\\Private_Projects\\\\HealthcareSystem'' -Recurse -Include ''*.exe'' | Unblock-File; Write-Host ''Done''\")",
+      "Bash(dotnet ef:*)",
+      "Bash(curl -s -X POST http://localhost:5273/api/user -H \"Content-Type: application/json\" -d \"{\"\"firstname\"\":\"\"Vivek\"\",\"\"middlename\"\":\"\"\"\",\"\"lastname\"\":\"\"Misra\"\",\"\"streetname\"\":\"\"Example Street 12\"\",\"\"cityId\"\":\"\"\"\",\"\"password\"\":\"\"test123\"\"}\")",
+      "Bash(dotnet build:*)",
+      "Bash(curl -s http://localhost:5273/api/client/ab8e8c4a-43d1-4c17-88cc-697000b8b819)"
+    ]
+  }
+}

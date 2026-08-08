@@ -1,4 +1,6 @@
 @page "/Accounts"
+@inject HttpClient Http
+@using Frontend.Models
 
 <PageTitle>Accounts</PageTitle>
 
@@ -10,37 +12,50 @@
     </header>
 
     <main class="screen-content">
-        <div class="account-list">
-            <article class="account-card">
-                <div class="small-avatar">👤</div>
-                <div class="account-information">
-                    <strong>Vivek</strong>
-                    <span>Primary account</span>
-                </div>
-                <button class="delete-button">×</button>
-            </article>
-
-            <article class="account-card">
-                <div class="small-avatar">👤</div>
-                <div class="account-information">
-                    <strong>Varun</strong>
-                    <span>Secondary account</span>
-                </div>
-                <button class="delete-button">×</button>
-            </article>
-
-            <article class="account-card">
-                <div class="small-avatar">👤</div>
-                <div class="account-information">
-                    <strong>Jyoti</strong>
-                    <span>Guest account</span>
-                </div>
-                <button class="delete-button">×</button>
-            </article>
-        </div>
-
-        <button class="primary-button">Save</button>
+        @if (users == null)
+        {
+            <p>Henter data...</p>
+        }
+        else if (users.Count == 0)
+        {
+            <p>Ingen konti fundet.</p>
+        }
+        else
+        {
+            <div class="account-list">
+                @foreach (var account in users)
+                {
+                    <article class="account-card">
+                        <div class="small-avatar">👤</div>
+                        <div class="account-information">
+                            <strong>@account.Firstname @account.Lastname</strong>
+                            <span>@account.Streetname</span>
+                        </div>
+                        <button class="delete-button" @onclick="() => DeleteUser(account.Id)">×</button>
+                    </article>
+                }
+            </div>
+        }
     </main>
 
     <BottomNavigation />
 </div>
+
+@code {
+    private List<UserDto>? users;
+
+    protected override async Task OnInitializedAsync()
+    {
+        // Henter brugere via firstname — erstat med relevant søgning
+        users = await Http.GetFromJsonAsync<List<UserDto>>("api/user/firstname/Vivek");
+    }
+
+    private async Task DeleteUser(string userId)
+    {
+        var response = await Http.DeleteAsync($"api/user/{userId}");
+        if (response.IsSuccessStatusCode && users != null)
+        {
+            users.RemoveAll(u => u.Id == userId);
+        }
+    }
+}

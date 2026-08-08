@@ -19,7 +19,7 @@ public class HealthCardService : IHealthCardService
             Id = Guid.NewGuid().ToString(),
             Cpr = healthCardInfo.Cpr,
             Sikringsgruppe = healthCardInfo.Sikringsgruppe,
-            ValidFrom = healthCardInfo.ValidFrom,
+            ValidFrom = DateTime.SpecifyKind(healthCardInfo.ValidFrom, DateTimeKind.Utc),
             ClientId = clientId,
             ClinicId = clinicId
         };
@@ -49,7 +49,7 @@ public class HealthCardService : IHealthCardService
         if (card == null) return null;
         card.Cpr = healthCardInfo.Cpr;
         card.Sikringsgruppe = healthCardInfo.Sikringsgruppe;
-        card.ValidFrom = healthCardInfo.ValidFrom;
+        card.ValidFrom = DateTime.SpecifyKind(healthCardInfo.ValidFrom, DateTimeKind.Utc);
         _db.SaveChanges();
         return card;
     }

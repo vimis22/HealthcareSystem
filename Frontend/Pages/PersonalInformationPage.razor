@@ -1,4 +1,6 @@
 @page "/PersonalInformation"
+@inject HttpClient Http
+@using Frontend.Models
 
 <PageTitle>Personal Information</PageTitle>
 
@@ -10,34 +12,100 @@
     </header>
 
     <main class="screen-content">
-        <div class="profile-layout">
-            <form class="profile-form">
-                <label>
-                    First name
-                    <input type="text" value="Vivek" />
-                </label>
+        @if (user == null)
+        {
+            <p>Henter data...</p>
+        }
+        else
+        {
+            <div class="profile-layout">
+                <form class="profile-form">
+                    <label>
+                        First name
+                        <input type="text" @bind="user.Firstname" />
+                    </label>
 
-                <label>
-                    Last name
-                    <input type="text" value="Misra" />
-                </label>
+                    <label>
+                        Middle name
+                        <input type="text" @bind="user.Middlename" />
+                    </label>
 
-                <label>
-                    Email
-                    <input type="email" value="example@email.com" />
-                </label>
+                    <label>
+                        Last name
+                        <input type="text" @bind="user.Lastname" />
+                    </label>
 
-                <label>
-                    Telephone
-                    <input type="tel" value="+45 12 34 56 78" />
-                </label>
-            </form>
+                    <label>
+                        Street
+                        <input type="text" @bind="user.Streetname" />
+                    </label>
 
-            <div class="large-avatar">👤</div>
-        </div>
+                    <label>
+                        Email
+                        <input type="email" value="@primaryEmail" readonly />
+                    </label>
 
-        <button class="primary-button">Save</button>
+                    <label>
+                        Telephone
+                        <input type="tel" value="@primaryPhone" readonly />
+                    </label>
+                </form>
+
+                <div class="large-avatar">👤</div>
+            </div>
+
+            <button class="primary-button" @onclick="SaveChanges">Save</button>
+
+            @if (!string.IsNullOrEmpty(statusMessage))
+            {
+                <p>@statusMessage</p>
+            }
+        }
     </main>
 
     <BottomNavigation />
 </div>
+
+@code {
+    private UserDto? user;
+    private string primaryEmail = "";
+    private string primaryPhone = "";
+    private string statusMessage = "";
+
+    // Midlertidigt hardcodet ID — erstattes med login senere
+    private string userId = "b34b6f5e-c9f6-43d7-bebe-5920f879f207";
+
+    protected override async Task OnInitializedAsync()
+    {
+        user = await Http.GetFromJsonAsync<UserDto>($"api/user/{userId}");
+
+        var emails = await Http.GetFromJsonAsync<List<EmailDto>>($"api/email/user/{userId}");
+        if (emails != null && emails.Count > 0)
+        {
+            var primary = emails.FirstOrDefault(e => e.IsPrimary) ?? emails[0];
+            primaryEmail = primary.Name;
+        }
+
+        var telephones = await Http.GetFromJsonAsync<List<TelephoneDto>>($"api/telephone/user/{userId}");
+        if (telephones != null && telephones.Count > 0)
+        {
+            primaryPhone = $"+{telephones[0].Countrycode} {telephones[0].Phonenumber}";
+        }
+    }
+
+    private async Task SaveChanges()
+    {
+        if (user == null) return;
+        var info = new UserInfoDto
+        {
+            Firstname = user.Firstname,
+            Middlename = user.Middlename,
+            Lastname = user.Lastname,
+            Streetname = user.Streetname,
+            CityId = user.CityId,
+            Password = user.Password
+        };
+        var response = await Http.PutAsJsonAsync($"api/user/{userId}", info);
+        statusMessage = response.IsSuccessStatusCode ? "Gemt!" : "Fejl ved gemning.";
+    }
+}
